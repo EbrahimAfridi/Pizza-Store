@@ -39,6 +39,9 @@ const cartSlice = createSlice({
       const item = state.cart.find((item) => item.pizzaId === action.payload);
       item.quantity--;
       item.totalPrice = item.quantity * item.unitPrice;
+
+    //   condition check for zero quantity of item
+      if(item.quantity === 0) cartSlice.caseReducers.deleteItem(state, action);
     },
 
     clearCart(state){
@@ -68,5 +71,7 @@ export const getTotalCartQuantity = (state) => (
 export const getTotalCartPrice = (state) => (
   state.cart.cart.reduce((sum, item) => sum + item.totalPrice, 0)
 )
+
+// ?? means if-not down is function under function
 export const getCurrentQuantityById = (id) => (state) => state.cart.cart.find((item) => item.pizzaId === id)?.quantity ?? 0;
 

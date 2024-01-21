@@ -68,7 +68,6 @@ const userSlice = createSlice({
       (state, action) => {
         state.status = "error";
         state.error = action.error.message;
-        console.error (action.error.message);
       }),
 });
 

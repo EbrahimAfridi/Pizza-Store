@@ -10,7 +10,7 @@ function UpdateOrder({order}){
   return(
     <fetcher.Form method="PATCH" className="text-right">
       <Button disabled={isLoading} type="primary">
-        { isLoading ? "Submitting..." : "Make order primary" }
+        { isLoading ? "Submitting..." : "Make order priority" }
       </Button>
     </fetcher.Form>
   )

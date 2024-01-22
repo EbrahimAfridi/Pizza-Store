@@ -45,6 +45,7 @@ function CreateOrder() {
   return (
     <div className="px-4 py-6">
       <h2 className="mb-8 text-xl font-semibold">Ready to order? Let's go!</h2>
+
       {/* <Form method="POST" action="/order/new"> */}
       <Form method="POST">
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -84,7 +85,7 @@ function CreateOrder() {
           {
             !position.latitude && !position.longitude &&
             (
-              <span className="absolute right-[3px] top-[32%] sm:right-[3px] sm:top-[3px] md:right-[5px] md:top-[5px] z-90">
+              <span className="absolute right-[3px] top-[50%] sm:right-[3px] sm:top-[3px] md:right-[5px] md:top-[5px] z-90">
                 <Button disabled={isLoadingAddress} type="small" onClick={(e) => {
                   e.preventDefault();
                   dispatch(fetchAddress())
@@ -111,6 +112,7 @@ function CreateOrder() {
           </label>
         </div>
 
+        {/* Values we are sending in the form but via hidden inputs to later extract them from the POST request */}
         <div>
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
           <input type="hidden" name="position" value={
@@ -123,35 +125,43 @@ function CreateOrder() {
             {isSubmitting ? 'Placing order....' : `Order now for ${formatCurrency(totalPrice)}`}
           </Button>
         </div>
+
       </Form>
+
     </div>
   );
 }
 
 export async function action({ request }) {
+  // Extract form data from the request
   const formData = await request.formData();
+  // Convert the form data into an object
   const data = Object.fromEntries(formData);
 
+  // Extract values from the data object and create an order object
   const order = {
     ...data,
     cart: JSON.parse(data.cart),
     priority: data.priority === 'true',
   };
 
+  // Validate the phone number using the isValidPhone function
   const errors = {};
   if (!isValidPhone(order.phone))
     errors.phone =
       'Please give us your correct phone number. We might need it to contact you.';
 
+  // If there are validation errors, return them
   if (Object.keys(errors).length > 0) return errors;
 
   // If everything is okay, create a new order and redirect
-
   const newOrder = await createOrder(order);
 
-  // Do not over use calling store directly this reduces performance of the page
+  // Do not over-use calling store directly this reduces performance of the page
+  // Clear the cart by dispatching the clearCart action using store.dispatch
   store.dispatch(clearCart());
 
+  // Redirecting to a new page using the redirect function
   return redirect(`/order/${newOrder.id}`);
 
 }
